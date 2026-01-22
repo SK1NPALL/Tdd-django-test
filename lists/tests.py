@@ -54,8 +54,8 @@ class ListViewTest(TestCase):
 
         response = self.client.get(f"/lists/{correct_list.id}/")  
 
-        self.assertContains(response, "itemey 1 (Priority: High)")
-        self.assertContains(response, "itemey 2 (Priority: Low)")
+        self.assertContains(response, "itemey 1 (Priority: priority 1)")
+        self.assertContains(response, "itemey 2 (Priority: priority 2)")
         
         self.assertNotContains(response, "other list item (Priority: other priority item)")  
 
