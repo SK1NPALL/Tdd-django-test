@@ -81,10 +81,9 @@ class ListAndItemModelsTest(TestCase):
         self.assertEqual(first_saved_item.list, mylist)
         self.assertEqual(second_saved_item.text, "Item the second")
         self.assertEqual(second_saved_item.list, mylist)
-
+        
 class NewItemTest(TestCase):
     def test_can_save_a_POST_request_to_an_existing_list(self):
-        other_list = List.objects.create()
         correct_list = List.objects.create()
 
         self.client.post(
@@ -96,9 +95,19 @@ class NewItemTest(TestCase):
         new_item = Item.objects.get()
         self.assertEqual(new_item.text, "A new item for an existing list")
         self.assertEqual(new_item.list, correct_list)
+        
+    # test for priority
+    
+    def test_item_model_can_save_priority(self):
+        mylist = List.objects.create()
+        item = Item.objects.create(
+            text="some text",
+            priority="High",  
+            list=mylist
+        )
+        self.assertEqual(Item.objects.get(id=item.id).priority, "High")
 
     def test_redirects_to_list_view(self):
-        other_list = List.objects.create()
         correct_list = List.objects.create()
 
         response = self.client.post(
@@ -107,3 +116,4 @@ class NewItemTest(TestCase):
         )
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
+        
