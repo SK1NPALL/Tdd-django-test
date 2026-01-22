@@ -12,7 +12,7 @@ class HomePageTest(TestCase):
         self.assertContains(response, '<form method="POST" action="/lists/new">') 
         self.assertContains(response, '<input name="item_text"')
         
-        self.assertContains(response, '<input name="item_piority"')
+        self.assertContains(response, '<input name="item_priority"')
 
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
@@ -42,7 +42,7 @@ class ListViewTest(TestCase):
             f'<form method="POST" action="/lists/{mylist.id}/add_item">',
         )
         self.assertContains(response, '<input name="item_text"')
-        self.assertContains(response, '<input name="item_piority"')
+        self.assertContains(response, '<input name="item_priority"')
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()  
