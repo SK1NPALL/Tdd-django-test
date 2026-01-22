@@ -46,16 +46,18 @@ class ListViewTest(TestCase):
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()  
-        Item.objects.create(text="itemey 1", list=correct_list)
-        Item.objects.create(text="itemey 2", list=correct_list)
+        Item.objects.create(text="itemey 1", priority="priority 1", list=correct_list)
+        Item.objects.create(text="itemey 2", priority="priority 2", list=correct_list)
+
         other_list = List.objects.create()  
-        Item.objects.create(text="other list item", list=other_list)
+        Item.objects.create(text="other list item", priority="other priority item", list=other_list)
 
         response = self.client.get(f"/lists/{correct_list.id}/")  
 
-        self.assertContains(response, "itemey 1")
-        self.assertContains(response, "itemey 2")
-        self.assertNotContains(response, "other list item")  
+        self.assertContains(response, "itemey 1 (Priority: High)")
+        self.assertContains(response, "itemey 2 (Priority: Low)")
+        
+        self.assertNotContains(response, "other list item (Priority: other priority item)")  
 
 class ListAndItemModelsTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -91,12 +93,14 @@ class NewItemTest(TestCase):
 
         self.client.post(
             f"/lists/{correct_list.id}/add_item",
-            data={"item_text": "A new item for an existing list"},
+            data={"item_text": "A new item for an existing list",
+                  "item_priority": "High"},
         )
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.get()
         self.assertEqual(new_item.text, "A new item for an existing list")
+        self.assertEqual(new_item.priority, "High")
         self.assertEqual(new_item.list, correct_list)
         
     # test for priority
@@ -115,7 +119,8 @@ class NewItemTest(TestCase):
 
         response = self.client.post(
             f"/lists/{correct_list.id}/add_item",
-            data={"item_text": "A new item for an existing list"},
+            data={"item_text": "A new item for an existing list",
+                  "item_priority": "High"},
         )
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
