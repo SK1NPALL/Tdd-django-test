@@ -1,4 +1,3 @@
-
 from django.test import LiveServerTestCase  # เปลี่ยนการ import
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -47,28 +46,39 @@ class NewVisitorTest(LiveServerTestCase):
         # She is invited to enter a to-do item straight away
         inputbox = self.browser.find_element(By.ID, "id_new_item")  
         self.assertEqual(inputbox.get_attribute("placeholder"), "Enter a to-do item")
-
+        
         # She types "Buy peacock feathers" into a text box
         # (Edith's hobby is tying fly-fishing lures)
         inputbox.send_keys("Buy peacock feathers")  
-
+        
+        # For priority feature
+        inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")  
+        self.assertEqual(inputbox_priority.get_attribute("placeholder"), "Enter a item priority")
+        
+        inputbox_priority.send_keys("High")
+        
         # When she hits enter, the page updates, and now the page lists
         # "1: Buy peacock feathers" as an item in a to-do list table
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table("1: Buy peacock feathers")
-
+        self.wait_for_row_in_list_table("1: Buy peacock feathers (Priority: High)")
+        
         # There is still a text box inviting her to add another item.
         # She enters "Use peacock feathers to make a fly"
         # (Edith is very methodical)
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys("Use peacock feathers to make a fly")
+        
+        inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")  
+        inputbox_priority.send_keys("Low")
+        
         inputbox.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly")
-        self.wait_for_row_in_list_table("1: Buy peacock feathers")
+        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly (Priority: Low)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers (Priority: High)")
 
          # Satisfied, she goes back to sleep
+         
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith starts a new to-do list
