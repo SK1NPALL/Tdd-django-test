@@ -63,7 +63,7 @@ class NewVisitorTest(LiveServerTestCase):
         # "1: Buy peacock feathers" as an item in a to-do list table
         inputbox_priority.send_keys(Keys.ENTER)
 
-        self.wait_for_row_in_list_table("1: Buy peacock feathers Priority(High)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
 
         # There is still a text box inviting her to add another item.
         # She enters "Use peacock feathers to make a fly"
@@ -78,7 +78,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # The page updates again, and now shows both items on her list
         self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly Priority(Low)")
-        self.wait_for_row_in_list_table("1: Buy peacock feathers Priority(High)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
 
          # Satisfied, she goes back to sleep
 
@@ -92,7 +92,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox_priority.send_keys("Medium")
 
         inputbox_priority.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table("1: Buy peacock feathers Priority(Medium)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(Medium)")
 
         # She notices that her list has a unique URL
         edith_list_url = self.browser.current_url
@@ -108,7 +108,7 @@ class NewVisitorTest(LiveServerTestCase):
         # list
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, "body").text
-        self.assertNotIn("Buy peacock feathers Priority(Medium)", page_text)
+        self.assertNotIn("Buy peacock feathers | Priority(Medium)", page_text)
 
         # Francis starts a new list by entering a new item. He
         # is less interesting than Edith...
@@ -119,7 +119,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox_priority.send_keys("High")
 
         inputbox_priority.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table("1: Buy milk Priority(High)")
+        self.wait_for_row_in_list_table("1: Buy milk | Priority(High)")
 
         # Francis gets his own unique URL
         francis_list_url = self.browser.current_url
@@ -128,8 +128,8 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Again, there is no trace of Edith's list
         page_text = self.browser.find_element(By.TAG_NAME, "body").text
-        self.assertNotIn("Buy peacock feathers Priority(Medium)", page_text)
-        self.assertIn("Buy milk Priority(High)", page_text)
+        self.assertNotIn("Buy peacock feathers | Priority(Medium)", page_text)
+        self.assertIn("Buy milk | Priority(High)", page_text)
 
         # Satisfied, they both go back to sleep
 

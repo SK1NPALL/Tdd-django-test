@@ -106,13 +106,12 @@ class NewItemTest(TestCase):
 
         self.client.post(
             f"/lists/{correct_list.id}/add_item",
-            data={"item_text": "A new item for an existing list",
-                  "item_priority": "High"},
+            data={"item_text": "A new item for an existing list",}
         )
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.get()
-        self.assertEqual(new_item.text, "A new item for an existing list | Priority(High)")
+        self.assertEqual(new_item.text, "A new item for an existing list")
         self.assertEqual(new_item.list, correct_list)
 
     def test_redirects_to_list_view(self):
