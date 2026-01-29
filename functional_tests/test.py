@@ -54,7 +54,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # She find the priority box
         inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")  
-        self.assertEqual(inputbox.get_attribute("placeholder"), "Enter a to-do item priority")
+        self.assertEqual(inputbox_priority.get_attribute("placeholder"), "Enter a priority")
 
         # She types "High" into a priority box
         inputbox_priority.send_keys("High") 
@@ -77,7 +77,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox_priority.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly Priority(Low)")
+        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly | Priority(Low)")
         self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
 
          # Satisfied, she goes back to sleep
