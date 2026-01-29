@@ -11,16 +11,28 @@ class HomePageTest(TestCase):
         response = self.client.get("/")
         self.assertContains(response, '<form method="POST" action="/lists/new">') 
         self.assertContains(response, '<input name="item_text"')
+        self.assertContains(response, '<input name="item_priority"')
 
 class NewListTest(TestCase):
     def test_can_save_a_POST_request(self):
-        self.client.post("/lists/new", data={"item_text": "A new list item"})
+        self.client.post("/lists/new", data={
+            
+            "item_text": "A new list item",
+            "item_priority": "Low"
+            
+            })
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.get()
         self.assertEqual(new_item.text, "A new list item")
+        self.assertEqual(new_item.priority, "Low")
 
     def test_redirects_after_POST(self):
-        response = self.client.post("/lists/new", data={"item_text": "A new list item"})
+        response = self.client.post("/lists/new", data={
+            
+            "item_text": "A new list item",
+            "item_priority": "Low"
+            
+            })
         new_list = List.objects.get()
         self.assertRedirects(response, f"/lists/{new_list.id}/")
 
@@ -40,19 +52,20 @@ class ListViewTest(TestCase):
             f'<form method="POST" action="/lists/{mylist.id}/add_item">',
         )
         self.assertContains(response, '<input name="item_text"')
+        self.assertContains(response, '<input name="item_priority"')
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()  
-        Item.objects.create(text="itemey 1", list=correct_list)
-        Item.objects.create(text="itemey 2", list=correct_list)
+        Item.objects.create(text="itemey 1", priority="High", list=correct_list)
+        Item.objects.create(text="itemey 2", priority="Low", list=correct_list)
         other_list = List.objects.create()  
-        Item.objects.create(text="other list item", list=other_list)
+        Item.objects.create(text="other list item", priority="Medium", list=other_list)
 
         response = self.client.get(f"/lists/{correct_list.id}/")  
 
-        self.assertContains(response, "itemey 1")
-        self.assertContains(response, "itemey 2")
-        self.assertNotContains(response, "other list item")  
+        self.assertContains(response, "itemey 1 | Priority(High)")
+        self.assertContains(response, "itemey 2 | Priority(Low)")
+        self.assertNotContains(response, "other list item | Priority(Medium)")  
 
 class ListAndItemModelsTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -61,11 +74,13 @@ class ListAndItemModelsTest(TestCase):
 
         first_item = Item()
         first_item.text = "The first (ever) list item"
+        first_item.priority = "Low"
         first_item.list = mylist
         first_item.save()
 
         second_item = Item()
         second_item.text = "Item the second"
+        second_item.priority = "High"
         second_item.list = mylist
         second_item.save()
 
@@ -78,32 +93,36 @@ class ListAndItemModelsTest(TestCase):
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text, "The first (ever) list item")
+        self.assertEqual(first_saved_item.priority, "Low")
         self.assertEqual(first_saved_item.list, mylist)
         self.assertEqual(second_saved_item.text, "Item the second")
+        self.assertEqual(second_saved_item.priority, "High")
         self.assertEqual(second_saved_item.list, mylist)
 
 class NewItemTest(TestCase):
     def test_can_save_a_POST_request_to_an_existing_list(self):
-        other_list = List.objects.create()
+       
         correct_list = List.objects.create()
 
         self.client.post(
             f"/lists/{correct_list.id}/add_item",
-            data={"item_text": "A new item for an existing list"},
+            data={"item_text": "A new item for an existing list",
+                  "item_priority": "High"},
         )
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.get()
-        self.assertEqual(new_item.text, "A new item for an existing list")
+        self.assertEqual(new_item.text, "A new item for an existing list | Priority(High)")
         self.assertEqual(new_item.list, correct_list)
 
     def test_redirects_to_list_view(self):
-        other_list = List.objects.create()
+     
         correct_list = List.objects.create()
 
         response = self.client.post(
             f"/lists/{correct_list.id}/add_item",
-            data={"item_text": "A new item for an existing list"},
+            data={"item_text": "A new item for an existing list",
+                  "item_priority": "Low"},
         )
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
