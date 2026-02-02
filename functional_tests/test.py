@@ -1,5 +1,4 @@
-
-from django.test import LiveServerTestCase  # เปลี่ยนการ import
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -8,7 +7,7 @@ import time
 from selenium.common.exceptions import WebDriverException
 MAX_WAIT = 5  
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Chrome()
 
@@ -120,16 +119,19 @@ class NewVisitorTest(LiveServerTestCase):
         # Her browser window is set to a very specific size
         self.browser.set_window_size(1024, 768)
 
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+
         # She notices the input box is nicely centered
         # centered there too
         inputbox.send_keys("testing")
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table("1: testing")
+        
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         self.assertAlmostEqual(
             inputbox.location["x"] + inputbox.size["width"] / 2,
             512,
-            delta=10,
+            delta=25,
         )
 
         

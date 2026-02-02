@@ -1,15 +1,5 @@
-<html>
-  <head>
-    <title>To-Do lists</title>
-  </head>
-  <body>
+{% extends 'base.html' %}
 
-    {% extends 'base.html' %}
+{% block header_text %}Start a new To-Do list{% endblock %}
 
-    {% block header_text %}Start a new To-Do list{% endblock %}
-
-    {% block form_action %}/lists/new{% endblock %}
-
-  <a href="{% url 'about' %}">Go to about page</a>
-</body>
-</html>
+{% block form_action %}/lists/new{% endblock %}
