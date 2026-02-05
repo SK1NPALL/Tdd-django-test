@@ -25,6 +25,10 @@ SECRET_KEY = 'django-insecure-l)*$g!83&-%*fe-xbbvu&pr#zsswypl2bxa*v%871%jbpbf$)9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://tdd-test-latest.onrender.com',
+]
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -42,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
