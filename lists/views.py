@@ -1,4 +1,4 @@
-from django.shortcuts import redirect , render
+from django.shortcuts import redirect , render 
 from django.http import HttpResponse
 from lists.models import Item , List
 
@@ -28,6 +28,19 @@ def add_item(request, list_id):
                         priority=request.POST["item_priority"],
                         list=our_list)
     return redirect(f"/lists/{our_list.id}/")
+
+def edit_item(request, list_id, item_id):
+    our_list = List.objects.get(id=list_id)
+    item = Item.objects.get(id=item_id)
+
+    if request.method == "POST":
+        item.text = request.POST["item_text"]
+        item.priority = request.POST["item_priority"]
+        item.save()
+        return redirect(f"/lists/{our_list.id}/")
+
+    return render(request, "edit.html", {"item": item, "list": our_list})
+    
 
     
 
