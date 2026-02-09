@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Edit To-Do item</title>
+  </head>
+  <body>
+    <h1>Edit your item</h1>
+
+    <form method="POST" action="/lists/{{ list.id }}/edit/{{ item.id }}/">
+      {% csrf_token %}
+      
+      <p>Item Text:</p>
+      <input name="item_text" id="id_new_item" value="{{ item.text }}" />
+      
+      <p>Priority:</p>
+      <input name="item_priority" id="id_new_item_priority" value="{{ item.priority }}" />
+
+      <br><br>
+      <button type="submit" id="id_save_button">Save Changes</button>
+      <a href="/lists/{{ list.id }}/">Cancel</a>
+    </form>
+  </body>
+</html>
