@@ -14,7 +14,7 @@
     <table id="id_list_table">
     {% for item in list.item_set.all %}  
         <tr><td>{{ forloop.counter }}: {{ item.text }} | Priority({{item.priority}})  
-        <a class="btn-edit" 
+        <a class="edit-button" 
           href="/lists/{{ list.id }}/edit/{{ item.id }}/"  
           style="border: solid 1px ;
                 padding: 3px;">

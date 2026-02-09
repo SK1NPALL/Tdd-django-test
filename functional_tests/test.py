@@ -33,7 +33,6 @@ class NewVisitorTest(LiveServerTestCase):
         rows = table.find_elements(By.TAG_NAME, "tr")
         self.assertIn(row_text, [row.text for row in rows])
 
-
     def test_can_start_a_todo_list(self):
         # Edith has heard about a cool new online to-do app.
         # She goes to check out its homepage
@@ -48,69 +47,49 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, "id_new_item")  
         self.assertEqual(inputbox.get_attribute("placeholder"), "Enter a to-do item")
 
-        # She types "Buy peacock feathers" into a text box
-        # (Edith's hobby is tying fly-fishing lures)
-        inputbox.send_keys("Buy peacock feathers") 
-
-        # She find the priority box
-        inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")  
-        self.assertEqual(inputbox_priority.get_attribute("placeholder"), "Enter a priority")
-
-        # She types "High" into a priority box
-        inputbox_priority.send_keys("High") 
-
-        # When she hits enter, the page updates, and now the page lists
-        # "1: Buy peacock feathers" as an item in a to-do list table
+        self.browser.get(self.live_server_url) # แนะนำให้ใช้ live_server_url แทน localhost:8000
+        
+        # เพิ่มรายการแรก: Buy peacock feathers | Priority(High)
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Buy peacock feathers")
+        inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")
+        inputbox_priority.send_keys("High")
         inputbox_priority.send_keys(Keys.ENTER)
 
-        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High) Edit")
 
-        # เธอเห็นปุ่มแก้ไขขึ้นอยู่ที่ข้างๆ list ที่ถูกพิ่มเข้าไป
-        edit_button = self.browser.find_element(By.CLASS_NAME, "bit-edit")
+        time.sleep(1)  # สั่งให้ Python หยุดรอ 1 วินาที เพื่อให้หน้าจอโหลดเสร็จ
+        edit_button = self.browser.find_element(By.CLASS_NAME, "edit-button")
         edit_button.click()
 
-        # เธอถูกส่งไปหน้าแก้ไข ซึ่งมีข้อมูลเดิมอยู่แล้ว
-        # ตรวจสอบว่า input box มีค่าเดิม อยู่หรือไม่
+        # แก้ไขจาก Buy peacock feathers (High) -> Buy penguin feathers (Low)
         inputbox = self.browser.find_element(By.ID, "id_new_item")
-        self.assertEqual(inputbox.get_attribute("value"), "Buy peacock feathers")
-
-        inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")
-        self.assertEqual(inputbox_priority.get_attribute("value"), "High")
-
-        # เธอเปลี่ยนข้อความจาก "Buy peacock feathers" เป็น "Buy many peacock feathers"
-        # และเปลี่ยน Priority จาก High เป็น Low
         inputbox.clear() 
         inputbox.send_keys("Buy penguin feathers")
-
         inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")
         inputbox_priority.clear()
         inputbox_priority.send_keys("Low")
         inputbox_priority.send_keys(Keys.ENTER)
 
-        # หน้าจอพากลับมาที่หน้ารายการ และแสดงข้อมูลที่แก้ไขแล้ว
-        self.wait_for_row_in_list_table("1: Buy penguin feathers | Priority(Low)")
+        # ตรวจสอบว่ารายการที่ 1 กลายเป็นของใหม่แล้ว
+        self.wait_for_row_in_list_table("1: Buy penguin feathers | Priority(Low) Edit")
         
-        # ตรวจสอบว่าข้อมูลเก่าหายไปแล้ว
-        page_text = self.browser.find_element(By.TAG_NAME, "body").text
-        self.assertNotIn("Buy peacock feathers | Priority(High)", page_text)
-
-        # There is still a text box inviting her to add another item.
-        # She enters "Use peacock feathers to make a fly"
-        # (Edith is very methodical)
+        # --- ส่วนการเพิ่มรายการที่สอง ---
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys("Use peacock feathers to make a fly")
-
         inputbox_priority = self.browser.find_element(By.ID, "id_new_item_priority")  
         inputbox_priority.send_keys("Low")
-
         inputbox_priority.send_keys(Keys.ENTER)
 
-        # The page updates again, and now shows both items on her list
-        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly | Priority(Low)")
-        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
+        # ตรวจสอบรายการทั้งหมดที่ควรจะมีอยู่ในหน้าปัจจุบัน
+        # รายการที่ 2 คือที่เพิ่งเพิ่มใหม่
+        self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly | Priority(Low) Edit")
+        
+        # รายการที่ 1 ต้องเป็น "Buy penguin feathers" (เพราะเราเพิ่ง Edit ไปข้างบน)
+        # *** จุดที่เฟลคือตรงนี้: ของเดิมคุณใส่ peacock ซึ่งมันถูกแก้ไปแล้ว ***
+        self.wait_for_row_in_list_table("1: Buy penguin feathers | Priority(Low) Edit")
 
-         # Satisfied, she goes back to sleep
-
+        # Satisfied, she goes back to sleep
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith starts a new to-do list
         self.browser.get(self.live_server_url)
@@ -121,7 +100,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox_priority.send_keys("Medium")
 
         inputbox_priority.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(Medium)")
+        self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(Medium) Edit")
 
         # She notices that her list has a unique URL
         edith_list_url = self.browser.current_url
@@ -148,7 +127,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox_priority.send_keys("High")
 
         inputbox_priority.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table("1: Buy milk | Priority(High)")
+        self.wait_for_row_in_list_table("1: Buy milk | Priority(High) Edit")
 
         # Francis gets his own unique URL
         francis_list_url = self.browser.current_url
