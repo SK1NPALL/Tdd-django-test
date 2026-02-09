@@ -66,7 +66,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table("1: Buy peacock feathers | Priority(High)")
 
         # เธอเห็นปุ่มแก้ไขขึ้นอยู่ที่ข้างๆ list ที่ถูกพิ่มเข้าไป
-        edit_button = self.browser.find_element(By.CLASS_NAME, "edit-button")
+        edit_button = self.browser.find_element(By.CLASS_NAME, "bit-edit")
         edit_button.click()
 
         # เธอถูกส่งไปหน้าแก้ไข ซึ่งมีข้อมูลเดิมอยู่แล้ว

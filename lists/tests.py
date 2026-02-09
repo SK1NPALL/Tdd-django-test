@@ -53,7 +53,7 @@ class ListViewTest(TestCase):
         )
         self.assertContains(response, '<input name="item_text"')
         self.assertContains(response, '<input name="item_priority"')
-
+        
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()  
         Item.objects.create(text="itemey 1", priority="High", list=correct_list)
@@ -65,6 +65,7 @@ class ListViewTest(TestCase):
 
         self.assertContains(response, "itemey 1 | Priority(High)")
         self.assertContains(response, "itemey 2 | Priority(Low)")
+        self.assertContains(response, '<a class="btn-edit"')
         self.assertNotContains(response, "other list item | Priority(Medium)")  
 
 class ListAndItemModelsTest(TestCase):
@@ -126,3 +127,56 @@ class NewItemTest(TestCase):
         )
 
         self.assertRedirects(response, f"/lists/{correct_list.id}/")
+
+class EditViewTest(TestCase):
+
+    # ดูว่าใช้ edit template ไหม
+    def test_uses_edit_template(self):
+        mylist = List.objects.create()
+        item = Item.objects.create(text="edit me", priority="Low", list=mylist)
+    
+        response = self.client.get(f'/lists/{mylist.id}/edit/{item.id}/')
+        self.assertTemplateUsed(response, 'edit.html')
+
+    # ดูว่า edit template ขึ้นข้อมูลเดิมไหม
+    def test_displays_item_data_in_form(self):
+
+        mylist = List.objects.create()
+        item = Item.objects.create(text="original text", priority="High", list=mylist)
+        
+        response = self.client.get(f'/lists/{mylist.id}/edit/{item.id}/')
+
+        # ตรวจสอบว่ามีข้อมูลเดิมอยู่ใน attribute 'value' ของ input
+        self.assertContains(response, 'value="original text"')
+        self.assertContains(response, 'value="High"')
+
+    # ดูว่ามันสามารถแก้ไขข้อมูลได้จริง
+    def test_can_save_a_post_request_to_an_existing_item(self):
+
+        mylist = List.objects.create()
+        item = Item.objects.create(text="old text", priority="Low", list=mylist)
+
+        # ส่งข้อมูลใหม่ไปที่ URL สำหรับแก้ไข
+        self.client.post(
+            f'/lists/{mylist.id}/edit/{item.id}/',
+            data={'item_text': 'new text', 'item_priority': 'Urgent'}
+        )
+
+        # ดึงข้อมูลจาก DB มาเช็คว่าเปลี่ยนจริงไหม
+        item.refresh_from_db()
+        self.assertEqual(item.text, 'new text')
+        self.assertEqual(item.priority, 'Urgent')
+
+    # เมื่อแก้ไขเสร็จแล้ว redirect กลับไปหน้า lists ไหม
+    def test_redirects_after_post(self):
+    
+        mylist = List.objects.create()
+        item = Item.objects.create(text="old", priority="Low", list=mylist)
+
+        response = self.client.post(
+            f'/lists/{mylist.id}/edit/{item.id}/',
+            data={'item_text': 'new', 'item_priority': 'High'}
+        )
+        self.assertRedirects(response, f'/lists/{mylist.id}/')
+
+    
