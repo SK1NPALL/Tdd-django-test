@@ -47,7 +47,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, "id_new_item")  
         self.assertEqual(inputbox.get_attribute("placeholder"), "Enter a to-do item")
 
-        self.browser.get(self.live_server_url) # แนะนำให้ใช้ live_server_url แทน localhost:8000
+        self.browser.get(self.live_server_url) 
         
         # เพิ่มรายการแรก: Buy peacock feathers | Priority(High)
         inputbox = self.browser.find_element(By.ID, "id_new_item")
@@ -86,7 +86,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table("2: Use peacock feathers to make a fly | Priority(Low) Edit")
         
         # รายการที่ 1 ต้องเป็น "Buy penguin feathers" (เพราะเราเพิ่ง Edit ไปข้างบน)
-        # *** จุดที่เฟลคือตรงนี้: ของเดิมคุณใส่ peacock ซึ่งมันถูกแก้ไปแล้ว ***
         self.wait_for_row_in_list_table("1: Buy penguin feathers | Priority(Low) Edit")
 
         # Satisfied, she goes back to sleep
