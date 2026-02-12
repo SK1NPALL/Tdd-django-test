@@ -34,6 +34,7 @@ else:
 
 CSRF_TRUSTED_ORIGINS = [
     'https://tdd-test-latest.onrender.com',
+    'https://kbkdev.works',
 ]
 
 ALLOWED_HOSTS = ['*']
