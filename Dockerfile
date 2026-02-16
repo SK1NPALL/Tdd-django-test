@@ -15,6 +15,7 @@ RUN python manage.py collectstatic
 ENV DJANGO_DEBUG_FALSE=1
 
 RUN adduser --uid 1234 nonroot  
+RUN chown -R nonroot:nonroot /src
 USER nonroot  
 
 CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8888 superlists.wsgi:application"]
