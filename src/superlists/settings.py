@@ -33,7 +33,7 @@ else:
     db_path = BASE_DIR / "db.sqlite3"
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://tdd-test-latest.onrender.com',
+
     'https://kbkdev.works',
 ]
 
@@ -99,9 +99,13 @@ WSGI_APPLICATION = 'superlists.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": db_path  
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django_db',
+        'USER': 'django_user',
+        'PASSWORD': 'django_password',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
