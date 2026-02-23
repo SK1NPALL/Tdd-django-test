@@ -4,19 +4,43 @@
 
 {% block form_action %}/lists/{{ list.id }}/add_item{% endblock %}
 
-{% block error_content %}
-  {% if error %}
-    <div class="invalid-feedback" style="color: red; margin-bottom: 10px;">
-      {{ error }}
-    </div>
-  {% endif %}
-{% endblock %}
-
 {% block table %}
   <table class="table" id="id_list_table">
     {% for item in list.item_set.all %}
       <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
     {% endfor %}
   </table>
+
   <a href="{% url 'about' %}">Go to about page</a>
+
+  <script>
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // หยุดการ Refresh หน้าเว็บ
+
+        const inputField = form.querySelector('input[name="item_text"]');
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // ส่งข้อมูลไป Server แบบเบื้องหลัง
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ item_text: inputField.value })
+        })
+        .then(res => res.json())
+        .then(data => {
+            // นำข้อมูลใหม่ที่ได้จาก Server มาแปะเพิ่มในตารางทันที
+            const table = document.getElementById('id_list_table');
+            const row = table.insertRow(-1); // เพิ่มแถวใหม่ที่ท้ายตาราง
+            const cell = row.insertCell(0);
+            cell.textContent = `${data.item_count}: ${data.item_text}`;
+
+            inputField.value = ''; // ล้างช่องพิมพ์
+        });
+    });
+  </script>
 {% endblock %}

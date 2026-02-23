@@ -1,7 +1,8 @@
 from django.shortcuts import redirect , render
-from django.http import HttpResponse
+from django.http import HttpResponse , JsonResponse
 from django.core.exceptions import ValidationError
 from lists.models import Item , List
+import json
 
 # Create your views here.
 
@@ -32,15 +33,19 @@ def view_list(request, list_id):
 
 def add_item(request, list_id):
     list_ = List.objects.get(id=list_id)
-    item = Item(list=list_, text=request.POST['item_text'])
-    try:
-        item.full_clean()
-        item.save()
-    except ValidationError:
-        error = "You can't have an empty list item"
-        return render(request, 'list.html', {"list": list_, "error": error})
-        
-    return redirect(f'/lists/{list_.id}/')
+    
+    # รับข้อมูล JSON จาก Fetch API
+    data = json.loads(request.body)
+    
+    # บันทึกลง Database
+    item = Item.objects.create(list=list_, text=data['item_text'])
+    
+    # ตอบกลับเฉพาะข้อมูลใหม่ที่เพิ่งเพิ่ม
+    return JsonResponse({
+        'message' : 'add item success!',
+        'item_text': item.text,
+        'item_count': list_.item_set.count()
+    })
     
 
     
